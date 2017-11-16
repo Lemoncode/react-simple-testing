@@ -726,7 +726,9 @@ trim_trailing_whitespace = true
     "no-var-requires": false,
     "no-empty": false,
     "member-ordering": false,
-    "member-access": false
+    "member-access": false,
+    "no-submodule-imports": false,
+    "no-implicit-dependencies": false
   }
 }
 

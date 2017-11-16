@@ -17,6 +17,7 @@ module.exports = merge(common, {
       'material-ui',
       'react',
       'react-dom',
+      'react-hot-loader',
       'react-router-dom',
       'whatwg-fetch',
     ],

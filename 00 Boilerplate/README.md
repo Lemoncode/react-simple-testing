@@ -1,6 +1,6 @@
 ## 00 Boilerplate
 
-In this sample we are going to create an app with `Login` component that navigate to other page. We are going to use [`lc-form-validation`](https://github.com/Lemoncode/lcFormValidation) to add validations to login form.
+In this sample we are going to create basic project structure with all configuration for TypeScript, Webpack, Karma, Tslint, React-hot-loader, etc.
 
 Summary steps:
 
@@ -12,6 +12,9 @@ Summary steps:
 - Add `tsconfig.json` and `.babelrc`.
 - Add `npm scripts`.
 - Add `.editorconfig` and `tslint.json`.
+- Add `index.html`.
+- Add `app.tsx` and `index.tsx` with `react-hot-loader` config.
+- Add empty `content/styles.scss`.
 
 # Steps to build it
 
@@ -25,14 +28,14 @@ Summary steps:
 - Run this command to install all `production` necessary dependencies:
 
 ```bash
-npm i babel-polyfill bootstrap lc-form-validation material-ui react react-dom react-router-dom whatwg-fetch -P
+npm i babel-polyfill bootstrap lc-form-validation material-ui react react-dom react-hot-loader react-router-dom whatwg-fetch -P
 
 ```
 
 - Run this command to install all `development` necessary dependencies:
 
 ```bash
-npm i @types/chai @types/enzyme @types/karma-chai-sinon @types/material-ui @types/mocha @types/react @types/react-dom @types/react-router-dom @types/sinon@1 @types/webpack-env awesome-typescript-loader babel-core babel-preset-env chai cross-env css-loader enzyme extract-text-webpack-plugin file-loader foreman html-webpack-plugin if-env istanbul-instrumenter-loader karma karma-chai karma-chrome-launcher karma-coverage karma-coverage-istanbul-reporter karma-mocha karma-mocha-reporter karma-sinon-chai karma-sourcemap-loader karma-webpack mocha node-sass react-addons-test-utils react-hot-loader react-test-renderer rimraf sass-loader sinon@1 sinon-chai style-loader tslint tslint-loader tslint-no-unused-expression-chai tslint-react typescript url-loader webpack webpack-dev-server webpack-merge -D
+npm i @types/chai @types/enzyme @types/karma-chai-sinon @types/material-ui @types/mocha @types/react @types/react-dom @types/react-router-dom @types/sinon@1 @types/webpack-env awesome-typescript-loader babel-core babel-preset-env chai cross-env css-loader enzyme extract-text-webpack-plugin file-loader foreman html-webpack-plugin if-env istanbul-instrumenter-loader karma karma-chai karma-chrome-launcher karma-coverage karma-coverage-istanbul-reporter karma-mocha karma-mocha-reporter karma-sinon-chai karma-sourcemap-loader karma-webpack mocha node-sass react-addons-test-utils react-test-renderer rimraf sass-loader sinon@1 sinon-chai style-loader tslint tslint-loader tslint-no-unused-expression-chai tslint-react typescript url-loader webpack webpack-dev-server webpack-merge -D
 
 ```
 
@@ -145,6 +148,7 @@ module.exports = merge(common, {
       'material-ui',
       'react',
       'react-dom',
+      'react-hot-loader',
       'react-router-dom',
       'whatwg-fetch',
     ],
@@ -558,6 +562,245 @@ module.exports = (config) => {
 
   config.set(karmaConfig);
 };
+
+```
+
+- Add `tsconfig.json` and `.babelrc`:
+
+### ./tsconfig.json
+
+```json
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "moduleResolution": "node",
+    "declaration": false,
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "jsx": "react",
+    "noLib": false,
+    "allowJs": true,
+    "suppressImplicitAnyIndexErrors": true
+  },
+  "compileOnSave": true,
+  "exclude": [
+    "node_modules"
+  ]
+}
+
+```
+
+### ./.babelrc
+
+```json
+{
+  "presets": [
+    [
+      "env",
+      {
+        "modules": false
+      }
+    ]
+  ],
+  "plugins": [
+    "react-hot-loader/babel"
+  ]
+}
+
+```
+
+- Add `npm scripts`:
+
+### ./pagacke.json
+
+```diff
+...
+  "scripts": {
+-   "test": "echo \"Error: no test specified\" && exit 1"
++   "start": "nf start",
++   "start:dev": "webpack-dev-server --config ./config/webpack/app/dev.js",
++   "start:prod": "cross-env REST_ENV=real NODE_ENV=production webpack-dev-server --config ./config/webpack/app/prod.js",
++   "build": "npm run build:dev",
++   "build:dev": "rimraf dist && webpack --config ./config/webpack/app/dev.js",
++   "build:prod": "rimraf dist && cross-env REST_ENV=real NODE_ENV=production webpack -p --config ./config/webpack/app/prod.js",
++   "test": "karma start ./config/karma/test.js --single-run --browsers ChromeHeadless",
++   "test:watch": "karma start ./config/karma/test.js",
++   "test:coverage": "karma start ./config/karma/coverage.js --single-run --browsers ChromeHeadless"
+  },
+...
+```
+
+- Add `.editorconfig` and `tslint.json`.
+
+### ./.editorconfig
+
+```
+root = true
+
+[*]
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+end_of_line = crlf
+charset = utf-8
+trim_trailing_whitespace = true
+
+```
+
+### ./tslint.json
+
+```json
+{
+  "extends": [
+    "tslint:latest",
+    "tslint-react"
+  ],
+  "rules": {
+    "jsx-alignment": true,
+    "jsx-self-close": true,
+    "class-name": true,
+    "interface-name": false,
+    "object-literal-sort-keys": false,
+    "ordered-imports": [
+      false
+    ],
+    "comment-format": [
+      true,
+      "check-space"
+    ],
+    "indent": [
+      true,
+      "spaces"
+    ],
+    "no-eval": true,
+    "no-internal-module": true,
+    "no-trailing-whitespace": true,
+    "no-unsafe-finally": true,
+    "no-var-keyword": true,
+    "only-arrow-functions": [
+      false
+    ],
+    "one-line": [
+      true,
+      "check-open-brace",
+      "check-whitespace"
+    ],
+    "quotemark": [
+      true,
+      "single",
+      "jsx-double"
+    ],
+    "semicolon": [
+      true,
+      "always"
+    ],
+    "triple-equals": [
+      true,
+      "allow-null-check"
+    ],
+    "typedef-whitespace": [
+      true,
+      {
+        "call-signature": "nospace",
+        "index-signature": "nospace",
+        "parameter": "nospace",
+        "property-declaration": "nospace",
+        "variable-declaration": "nospace"
+      }
+    ],
+    "variable-name": [
+      true,
+      "ban-keywords"
+    ],
+    "whitespace": [
+      true,
+      "check-branch",
+      "check-decl",
+      "check-operator",
+      "check-separator",
+      "check-type"
+    ],
+    "jsx-no-multiline-js": false,
+    "jsx-wrap-multiline": false,
+    "no-var-requires": false,
+    "no-empty": false,
+    "member-ordering": false,
+    "member-access": false
+  }
+}
+
+```
+
+- Add `index.html`:
+
+### ./src/index.html
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <title>App</title>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+
+```
+
+- Add `app.tsx` and `index.tsx` with `react-hot-loader` config:
+
+### ./src/app.tsx
+
+```javascript
+import * as React from 'react';
+
+export const App: React.StatelessComponent = (props) => (
+  <h1>Hello React</h1>
+);
+
+```
+
+### ./src/index.tsx
+
+```javascript
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import { AppContainer } from 'react-hot-loader';
+import { App } from './app';
+
+const render = (Component) => {
+  ReactDOM.render(
+    <AppContainer>
+      <Component />
+    </AppContainer>,
+    document.getElementById('root'),
+  );
+};
+
+render(App);
+
+if (module.hot) {
+  module.hot.accept('./app', () => {
+    render(App);
+  });
+}
+
+```
+
+- Add empty global styles `styles.scss`:
+
+### ./src/content/styles/styles.scss
+
+```scss
 
 ```
 

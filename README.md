@@ -7,13 +7,17 @@ Each sample contains a `README.md` file that indicates the purpose of the sample
 
 ## 00 Boilerplate
 
-In this sample we are going to create an app with `Login` component that navigate to other page. We are going to use [`lc-form-validation`](https://github.com/Lemoncode/lcFormValidation) to add validations to login form.
+In this sample we are going to create basic project structure with all configuration for TypeScript, Webpack, Karma, Tslint, React-hot-loader, etc.
 
-## 01 Testing validations
+## 01 Login Component
+
+In this sample we are going to create an app with `Login` component that navigate to other page. We are going to use [`lc-form-validation`](https://github.com/Lemoncode/lcFormValidation) to add login form validations.
+
+## 02 Testing validations
 
 In this sample we are going to add unit tests. In this case, we will test all app business logic.
 
-## 02 Testing components
+## 03 Testing components
 
 In this sample we are going to add unit tests. In this case, we will test all app business logic.
 

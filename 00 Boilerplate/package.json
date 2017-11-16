@@ -5,10 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "nf start",
-    "start:dev": "webpack-dev-server --config ./config/webpack/app/webpack.config.dev.js",
-    "start:prod": "cross-env REST_ENV=real NODE_ENV=production webpack-dev-server --config ./config/webpack/app/webpack.config.prod.js",
-    "test": "karma start ./config/karma/karma.config.test.js --single-run --browsers ChromeHeadless",
-    "test:watch": "karma start ./config/karma/karma.config.test.js"
+    "start:dev": "webpack-dev-server --config ./config/webpack/app/dev.js",
+    "start:prod": "cross-env REST_ENV=real NODE_ENV=production webpack-dev-server --config ./config/webpack/app/prod.js",
+    "build": "npm run build:dev",
+    "build:dev": "rimraf dist && webpack --config ./config/webpack/app/dev.js",
+    "build:prod": "rimraf dist && cross-env REST_ENV=real NODE_ENV=production webpack -p --config ./config/webpack/app/prod.js",
+    "test": "karma start ./config/karma/test.js --single-run --browsers ChromeHeadless",
+    "test:watch": "karma start ./config/karma/test.js",
+    "test:coverage": "karma start ./config/karma/coverage.js --single-run --browsers ChromeHeadless"
   },
   "repository": {
     "type": "git",
@@ -32,6 +36,7 @@
     "material-ui": "^0.19.4",
     "react": "^16.1.1",
     "react-dom": "^16.1.1",
+    "react-hot-loader": "^3.1.3",
     "react-router-dom": "^4.2.2",
     "whatwg-fetch": "^2.0.3"
   },
@@ -72,7 +77,6 @@
     "mocha": "^4.0.1",
     "node-sass": "^4.6.1",
     "react-addons-test-utils": "^15.6.2",
-    "react-hot-loader": "^3.1.3",
     "react-test-renderer": "^16.1.1",
     "rimraf": "^2.6.2",
     "sass-loader": "^6.0.6",

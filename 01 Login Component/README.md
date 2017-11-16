@@ -5,11 +5,15 @@ In this sample we are going to create an app with `Login` component that navigat
 Summary steps:
 
 - Add dummy `Login` component.
-- Define general `routes`.
+- Define `general` routes.
 - Update `app.tsx`.
-- Add app `routes`.
+- Add `app` routes.
 - Add `router` config.
 - Update `index.tsx`.
+- Add dummy `Member` page in `admin` module.
+- Define `admin` routes.
+- Update `app` routes.
+- Add link to navigate.
 
 # Steps to build it
 
@@ -52,7 +56,7 @@ export * from './pageContainer';
 
 ```
 
-- Define general `routes`.
+- Define `general` routes.
 
 ### ./src/common/constants/routes/general/index.ts
 
@@ -104,7 +108,7 @@ export const App: React.StatelessComponent = (props) => (
 
 ```
 
-- Add app `routes`:
+- Add `app` routes:
 
 ### ./src/appRoutes.tsx
 
@@ -180,6 +184,132 @@ if (module.hot) {
 +   render(AppRouter);
   });
 }
+
+```
+
+- Add dummy `Member` page in `admin` module:
+
+### ./src/pages/admin/member/list/page.tsx
+
+```javascript
+import * as React from 'react';
+import { Link } from 'react-router-dom';
+import { generalRoutes } from '../../../../common/constants/routes/general';
+
+export const MemberListPage: React.StatelessComponent = (props) => (
+  <div>
+    <h1>Member list Page</h1>
+    <Link
+      to={generalRoutes.login}
+    >
+      Go back
+    </Link>
+  </div>
+);
+
+```
+
+### ./src/pages/admin/member/list/pageContainer.tsx
+
+```javascript
+import * as React from 'react';
+import { MemberListPage } from './page';
+
+export const MemberListPageContainer: React.StatelessComponent = (props) => (
+  <MemberListPage />
+);
+
+```
+
+### ./src/pages/admin/member/list/index.ts
+
+```javascript
+export * from './pageContainer';
+
+```
+
+### ./src/pages/admin/member/index.ts
+
+```javascript
+export * from './list';
+
+```
+
+- Define `admin` routes:
+
+### ./src/common/constants/routes/admin/index.ts
+
+```javascript
+const baseUrl = '/admin';
+
+export const adminRoutes = {
+  default: baseUrl,
+  memberList: `${baseUrl}/member/list`,
+};
+
+```
+
+### ./src/pages/admin/routes.tsx
+
+```javascript
+import * as React from 'react';
+import { Switch, Route } from 'react-router-dom';
+import { adminRoutes } from '../../common/constants/routes/admin';
+import { MemberListPageContainer } from './member';
+
+export const AdminRoutes: React.StatelessComponent = (props) => (
+  <Switch>
+    <Route exact={true} path={adminRoutes.default} component={MemberListPageContainer} />
+    <Route path={adminRoutes.memberList} component={MemberListPageContainer} />
+  </Switch>
+);
+
+```
+
+### ./src/pages/admin/index.ts
+
+```javascript
+export * from './routes';
+
+```
+
+- Update `app` routes:
+
+### ./src/appRoutes.tsx
+
+```diff
+import * as React from 'react';
+import { App } from './app';
+import { GeneralRoutes } from './pages/general';
++ import { AdminRoutes } from './pages/admin';
+
+export const AppRoutes: React.StatelessComponent = (props) => (
+  <App>
+    <GeneralRoutes />
++   <AdminRoutes />
+  </App>
+);
+
+```
+
+- Add link to navigate:
+
+### ./src/pages/general/login/page.tsx
+
+```diff
+import * as React from 'react';
++ import { Link } from 'react-router-dom';
++ import { adminRoutes } from '../../../common/constants/routes/admin';
+
+export const LoginPage: React.StatelessComponent = (props) => (
+- <h1>Login Page</h1>
++ <div>
++   <h1>Login Page</h1>
++   <Link to={adminRoutes.memberList}>
++     Navigate to Member List
++   </Link>
++ </div>
+);
 
 ```
 

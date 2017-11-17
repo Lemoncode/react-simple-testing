@@ -616,6 +616,8 @@ import { adminRoutes } from '../../../common/constants/routes/admin';
 
 - Update login `pageContainer`:
 
+### ./src/pages/general/login/pageContainer.tsx
+
 ```diff
 import * as React from 'react';
 + import {
@@ -690,6 +692,168 @@ export const App: React.StatelessComponent = (props) => (
 );
 
 ```
+
+- Now, it's time to add validations and extract business from `pageContainer`:
+
+### ./src/pages/general/login/validations.ts
+
+```javascript
+import { ValidationConstraints, Validators, createFormValidation } from 'lc-form-validation';
+
+const validationConstraints: ValidationConstraints = {
+  fields: {
+    login: [
+      { validator: Validators.required },
+    ],
+    password: [
+      { validator: Validators.required },
+    ],
+  },
+};
+
+export const validations =  createFormValidation(validationConstraints);
+
+```
+
+### ./src/pages/general/login/pageContainer.state.ts
+
+```javascript
+import { LoginCredential, LoginCredentialError } from './viewModel';
+
+export interface State {
+  loginCredential: LoginCredential;
+  loginCredentialError: LoginCredentialError;
+}
+
+```
+
+### ./src/pages/general/login/pageContainer.business.ts
+
+```javascript
+import { FieldValidationResult, FormValidationResult } from 'lc-form-validation';
+import * as toastr from 'toastr';
+import { LoginCredential, LoginCredentialError, createEmptyLoginCredential } from './viewModel';
+import { State } from './pageContainer.state';
+import { history } from '../../../history';
+import { adminRoutes } from '../../../common/constants/routes/admin';
+
+export const onUpdateField = (field: string, value: string, fieldValidationResult: FieldValidationResult) =>
+  (state: State): State => ({
+    ...state,
+    loginCredential: {
+      ...state.loginCredential,
+      [field]: value,
+    },
+    loginCredentialError: {
+      ...state.loginCredentialError,
+      [field]: fieldValidationResult,
+    },
+  });
+
+export const onLogin = (formValidationResult: FormValidationResult) =>
+  (state: State): State => {
+    toastr.remove();
+    if (isValidLogin(state.loginCredential)) {
+      toastr.success('Login success');
+      history.push(adminRoutes.memberList);
+    } else {
+      toastr.error('Login fail');
+    }
+    return updateFormErrors(state, formValidationResult);
+  };
+
+// TODO: Move to api
+const isValidLogin = (loginCredential: LoginCredential) => (
+  loginCredential.login === 'admin' &&
+  loginCredential.password === 'test'
+);
+
+const updateFormErrors = (state: State, formValidationResult: FormValidationResult): State => ({
+  ...state,
+  loginCredentialError: getFieldValidationResult(state, formValidationResult),
+});
+
+const getFieldValidationResult = (state: State, formValidationResult: FormValidationResult) => (
+  formValidationResult.fieldErrors.reduce((errors, fieldValidationResult) => ({
+    ...errors,
+    [fieldValidationResult.key]: fieldValidationResult,
+  }), state.loginCredentialError)
+);
+
+```
+
+- Update `pageContainer`:
+
+### ./src/pages/general/login/pageContainer.tsx
+
+```diff
+import * as React from 'react';
+import {
+  LoginCredential, createEmptyLoginCredential,
+  LoginCredentialError, createEmptyLoginCredentialError,
+} from './viewModel';
++ import { State } from './pageContainer.state';
++ import * as business from './pageContainer.business';
++ import { validations } from './validations';
+- import { history } from '../../../history';
+- import { adminRoutes } from '../../../common/constants/routes/admin';
+import { LoginPage } from './page';
+
+- interface State {
+-   loginCredential: LoginCredential;
+-   loginCredentialError: LoginCredentialError;
+- }
+
+export class LoginPageContainer extends React.Component<{}, State> {
+  state = {
+    loginCredential: createEmptyLoginCredential(),
+    loginCredentialError: createEmptyLoginCredentialError(),
+  };
+
+  onUpdateField = (field: string, value: string) => {
+-   this.setState({
+-     ...this.state,
+-     loginCredential: {
+-       ...this.state.loginCredential,
+-       [field]: value,
+-     },
+-   });
++   validations
++     .validateField(this.state.loginCredential, field, value)
++     .then((fieldValidationResult) => {
++       this.setState(business.onUpdateField(field, value, fieldValidationResult));
++     });
+  }
+
+  onLogin = () => {
+-   if (this.state.loginCredential.login === 'admin' &&
+-     this.state.loginCredential.password === 'test') {
+-     history.push(adminRoutes.memberList);
+-   }
++   validations
++     .validateForm(this.state.loginCredential)
++     .then((formValidationResult) => {
++       this.setState(business.onLogin(formValidationResult));
++     });
+  }
+
+  render() {
+    return (
+      <LoginPage
+        loginCredential={this.state.loginCredential}
+        loginCredentialError={this.state.loginCredentialError}
+        onUpdateField={this.onUpdateField}
+        onLogin={this.onLogin}
+      />
+    );
+  }
+}
+
+```
+
+- Finally, we could create a mock `login API`:
+
+
 
 # About Lemoncode
 

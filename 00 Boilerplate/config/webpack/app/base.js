@@ -13,12 +13,14 @@ module.exports = merge(common, {
     ],
     vendor: [
       'babel-polyfill',
+      'jquery',
       'lc-form-validation',
       'material-ui',
       'react',
       'react-dom',
       'react-hot-loader',
       'react-router-dom',
+      'toastr',
       'whatwg-fetch',
     ],
     appStyles: [
@@ -26,6 +28,7 @@ module.exports = merge(common, {
     ],
     vendorStyles: [
       '../node_modules/bootstrap/dist/css/bootstrap.css',
+      '../node_modules/toastr/build/toastr.css',
     ],
   },
 

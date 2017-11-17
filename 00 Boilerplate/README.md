@@ -28,14 +28,14 @@ Summary steps:
 - Run this command to install all `production` necessary dependencies:
 
 ```bash
-npm i babel-polyfill bootstrap lc-form-validation material-ui react react-dom react-hot-loader react-router-dom whatwg-fetch -P
+npm i babel-polyfill bootstrap jquery lc-form-validation material-ui react react-dom react-hot-loader react-router-dom toastr whatwg-fetch -P
 
 ```
 
 - Run this command to install all `development` necessary dependencies:
 
 ```bash
-npm i @types/chai @types/enzyme @types/karma-chai-sinon @types/material-ui @types/mocha @types/react @types/react-dom @types/react-router-dom @types/sinon@1 @types/webpack-env awesome-typescript-loader babel-core babel-preset-env chai cross-env css-loader enzyme extract-text-webpack-plugin file-loader foreman html-webpack-plugin if-env istanbul-instrumenter-loader karma karma-chai karma-chrome-launcher karma-coverage karma-coverage-istanbul-reporter karma-mocha karma-mocha-reporter karma-sinon-chai karma-sourcemap-loader karma-webpack mocha node-sass react-addons-test-utils react-test-renderer rimraf sass-loader sinon@1 sinon-chai style-loader tslint tslint-loader tslint-no-unused-expression-chai tslint-react typescript url-loader webpack webpack-dev-server webpack-merge -D
+npm i @types/chai @types/enzyme @types/karma-chai-sinon @types/material-ui @types/mocha @types/react @types/react-dom @types/react-router-dom @types/sinon@1 @types/toastr @types/webpack-env awesome-typescript-loader babel-core babel-preset-env chai cross-env css-loader enzyme extract-text-webpack-plugin file-loader foreman html-webpack-plugin if-env istanbul-instrumenter-loader karma karma-chai karma-chrome-launcher karma-coverage karma-coverage-istanbul-reporter karma-mocha karma-mocha-reporter karma-sinon-chai karma-sourcemap-loader karma-webpack mocha node-sass react-addons-test-utils react-test-renderer rimraf sass-loader sinon@1 sinon-chai style-loader tslint tslint-loader tslint-no-unused-expression-chai tslint-react typescript url-loader webpack webpack-dev-server webpack-merge -D
 
 ```
 
@@ -144,12 +144,14 @@ module.exports = merge(common, {
     ],
     vendor: [
       'babel-polyfill',
+      'jquery',
       'lc-form-validation',
       'material-ui',
       'react',
       'react-dom',
       'react-hot-loader',
       'react-router-dom',
+      'toastr',
       'whatwg-fetch',
     ],
     appStyles: [
@@ -157,6 +159,7 @@ module.exports = merge(common, {
     ],
     vendorStyles: [
       '../node_modules/bootstrap/dist/css/bootstrap.css',
+      '../node_modules/toastr/build/toastr.css',
     ],
   },
 

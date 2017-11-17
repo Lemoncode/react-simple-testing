@@ -3,14 +3,10 @@ import {
   LoginCredential, createEmptyLoginCredential,
   LoginCredentialError, createEmptyLoginCredentialError,
 } from './viewModel';
-import { history } from '../../../history';
-import { adminRoutes } from '../../../common/constants/routes/admin';
+import { State } from './pageContainer.state';
+import * as business from './pageContainer.business';
+import { validations } from './validations';
 import { LoginPage } from './page';
-
-interface State {
-  loginCredential: LoginCredential;
-  loginCredentialError: LoginCredentialError;
-}
 
 export class LoginPageContainer extends React.Component<{}, State> {
   state = {
@@ -19,20 +15,19 @@ export class LoginPageContainer extends React.Component<{}, State> {
   };
 
   onUpdateField = (field: string, value: string) => {
-    this.setState({
-      ...this.state,
-      loginCredential: {
-        ...this.state.loginCredential,
-        [field]: value,
-      },
-    });
+    validations
+      .validateField(this.state.loginCredential, field, value)
+      .then((fieldValidationResult) => {
+        this.setState(business.onUpdateField(field, value, fieldValidationResult));
+      });
   }
 
   onLogin = () => {
-    if (this.state.loginCredential.login === 'admin' &&
-      this.state.loginCredential.password === 'test') {
-      history.push(adminRoutes.memberList);
-    }
+    validations
+      .validateForm(this.state.loginCredential)
+      .then((formValidationResult) => {
+        this.setState(business.onLogin(formValidationResult));
+      });
   }
 
   render() {

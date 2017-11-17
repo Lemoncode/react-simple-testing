@@ -4,6 +4,8 @@ import { LoginCredential, LoginCredentialError, createEmptyLoginCredential } fro
 import { State } from './pageContainer.state';
 import { history } from '../../../history';
 import { adminRoutes } from '../../../common/constants/routes/admin';
+import { login } from '../../../rest-api/api/general';
+import { mapLoginCredentialVmToModel } from './mappers';
 
 export const onUpdateField = (field: string, value: string, fieldValidationResult: FieldValidationResult) =>
   (state: State): State => ({
@@ -21,20 +23,19 @@ export const onUpdateField = (field: string, value: string, fieldValidationResul
 export const onLogin = (formValidationResult: FormValidationResult) =>
   (state: State): State => {
     toastr.remove();
-    if (isValidLogin(state.loginCredential)) {
-      toastr.success('Login success');
-      history.push(adminRoutes.memberList);
-    } else {
-      toastr.error('Login fail');
-    }
+
+    const loginCredentialModel = mapLoginCredentialVmToModel(state.loginCredential);
+    login(loginCredentialModel)
+      .then(() => {
+        toastr.success('Login success');
+        history.push(adminRoutes.memberList);
+      })
+      .catch((error) => {
+        toastr.error(error);
+      });
+
     return updateFormErrors(state, formValidationResult);
   };
-
-// TODO: Move to api
-const isValidLogin = (loginCredential: LoginCredential) => (
-  loginCredential.login === 'admin' &&
-  loginCredential.password === 'test'
-);
 
 const updateFormErrors = (state: State, formValidationResult: FormValidationResult): State => ({
   ...state,

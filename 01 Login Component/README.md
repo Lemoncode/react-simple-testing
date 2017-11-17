@@ -14,7 +14,10 @@ Summary steps:
 - Define `admin` routes.
 - Update `app` routes.
 - Add link to navigate.
+- Implement `common` components.
 - Implement `Login` page.
+- Extract business from `pageContainer`.
+- Create mock `login API`.
 
 # Steps to build it
 
@@ -853,7 +856,156 @@ export class LoginPageContainer extends React.Component<{}, State> {
 
 - Finally, we could create a mock `login API`:
 
+### ./src/rest-api/model/general/loginCredential.ts
 
+```javascript
+export interface LoginCredential {
+  login: string;
+  password: string;
+}
+
+```
+
+### ./src/rest-api/model/general/index.ts
+
+```javascript
+export * from './loginCredential';
+
+```
+
+### ./src/rest-api/api/config.ts
+
+```javascript
+export const config = {
+  useRealAPI: (process.env.REST_ENV === 'real'),
+};
+
+```
+
+### ./src/rest-api/api/general/login/contract.ts
+
+```javascript
+import { LoginCredential } from '../../../model/general';
+
+export type Login = (loginCredential: LoginCredential) => Promise<boolean>;
+
+```
+
+### ./src/rest-api/api/general/login/double.ts
+
+```javascript
+import { LoginCredential } from '../../../model/general';
+import { Login } from './contract';
+
+export const login: Login = (loginCredential: LoginCredential): Promise<boolean> => (
+  isValidLogin(loginCredential) ?
+    Promise.resolve(true) :
+    Promise.reject('Login Fail')
+);
+
+const isValidLogin = (loginCredential: LoginCredential) => (
+  loginCredential.login === 'admin' &&
+  loginCredential.password === 'test'
+);
+
+```
+
+### ./src/rest-api/api/general/login/real.ts
+
+```javascript
+import { LoginCredential } from '../../../model/general';
+import { Login } from './contract';
+
+// TODO: Implement real
+export const login: Login = (loginCredential: LoginCredential): Promise<boolean> => (
+  Promise.resolve(true)
+);
+
+```
+
+### ./src/rest-api/api/general/login/index.ts
+
+```javascript
+import { Login } from './contract';
+import * as double from './double';
+import * as real from './real';
+import { config } from '../config';
+
+export const login: Login = config.useRealAPI ?
+  real.login :
+  double.login;
+
+```
+
+### ./src/rest-api/api/general/index.ts
+
+```javascript
+export * from './login';
+
+```
+
+- Create `mappers` to map from `viewModel` to `model`:
+
+### ./src/pages/general/login/mappers.ts
+
+```javascript
+import * as model from '../../../rest-api/model/general';
+import * as vm from './viewModel';
+
+export const mapLoginCredentialVmToModel = (logingCredential: vm.LoginCredential): model.LoginCredential => ({
+  ...logingCredential,
+});
+
+```
+
+- And use it:
+
+### ./src/pages/general/login/pageContainer.business.ts
+
+```diff
+import { FieldValidationResult, FormValidationResult } from 'lc-form-validation';
+import * as toastr from 'toastr';
+import { LoginCredential, LoginCredentialError, createEmptyLoginCredential } from './viewModel';
+import { State } from './pageContainer.state';
+import { history } from '../../../history';
+import { adminRoutes } from '../../../common/constants/routes/admin';
++ import { login } from '../../../rest-api/api/general';
++ import { mapLoginCredentialVmToModel } from './mappers';
+
+...
+
+export const onLogin = (formValidationResult: FormValidationResult) =>
+  (state: State): State => {
+    toastr.remove();
+-   if (isValidLogin(state.loginCredential)) {
+-     toastr.success('Login success');
+-     history.push(adminRoutes.memberList);
+-   } else {
+-     toastr.error('Login fail');
+-   }
+
++   const loginCredentialModel = mapLoginCredentialVmToModel(state.loginCredential);
++   login(loginCredentialModel)
++     .then(() => {
++       toastr.success('Login success');
++       history.push(adminRoutes.memberList);
++     })
++     .catch((error) => {
++       toastr.error(error);
++     });
+
+    return updateFormErrors(state, formValidationResult);
+  };
+
+- // TODO: Move to api
+- const isValidLogin = (loginCredential: LoginCredential) => (
+-   loginCredential.login === 'admin' &&
+-   loginCredential.password === 'test'
+- );
+
+...
+
+```
 
 # About Lemoncode
 

@@ -753,17 +753,15 @@ export const onUpdateField = (field: string, value: string, fieldValidationResul
     },
   });
 
-export const onLogin = (formValidationResult: FormValidationResult) =>
-  (state: State): State => {
-    toastr.remove();
-    if (isValidLogin(state.loginCredential)) {
-      toastr.success('Login success');
-      history.push(adminRoutes.memberList);
-    } else {
-      toastr.error('Login fail');
-    }
-    return updateFormErrors(state, formValidationResult);
-  };
+export const onLogin = (loginCredential: LoginCredential) => {
+  toastr.remove();
+  if (isValidLogin(loginCredential)) {
+    toastr.success('Login success');
+    history.push(adminRoutes.memberList);
+  } else {
+    toastr.error('Login fail');
+  }
+};
 
 // TODO: Move to api
 const isValidLogin = (loginCredential: LoginCredential) => (
@@ -771,7 +769,7 @@ const isValidLogin = (loginCredential: LoginCredential) => (
   loginCredential.password === 'test'
 );
 
-const updateFormErrors = (state: State, formValidationResult: FormValidationResult): State => ({
+export const updateFormErrors = (formValidationResult: FormValidationResult) => (state: State): State => ({
   ...state,
   loginCredentialError: getFieldValidationResult(state, formValidationResult),
 });
@@ -836,7 +834,8 @@ export class LoginPageContainer extends React.Component<{}, State> {
 +   validations
 +     .validateForm(this.state.loginCredential)
 +     .then((formValidationResult) => {
-+       this.setState(business.onLogin(formValidationResult));
++       business.onLogin(this.state.loginCredential);
++       this.setState(business.updateFormErrors(formValidationResult));
 +     });
   }
 
@@ -974,17 +973,16 @@ import { adminRoutes } from '../../../common/constants/routes/admin';
 
 ...
 
-export const onLogin = (formValidationResult: FormValidationResult) =>
-  (state: State): State => {
-    toastr.remove();
--   if (isValidLogin(state.loginCredential)) {
+export const onLogin = (loginCredential: LoginCredential) => {
+  toastr.remove();
+-   if (isValidLogin(loginCredential)) {
 -     toastr.success('Login success');
 -     history.push(adminRoutes.memberList);
 -   } else {
 -     toastr.error('Login fail');
 -   }
 
-+   const loginCredentialModel = mapLoginCredentialVmToModel(state.loginCredential);
++   const loginCredentialModel = mapLoginCredentialVmToModel(loginCredential);
 +   login(loginCredentialModel)
 +     .then(() => {
 +       toastr.success('Login success');
@@ -993,8 +991,6 @@ export const onLogin = (formValidationResult: FormValidationResult) =>
 +     .catch((error) => {
 +       toastr.error(error);
 +     });
-
-    return updateFormErrors(state, formValidationResult);
   };
 
 - // TODO: Move to api

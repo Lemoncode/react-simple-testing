@@ -733,7 +733,10 @@ trim_trailing_whitespace = true
     "member-ordering": false,
     "member-access": false,
     "no-submodule-imports": false,
-    "no-implicit-dependencies": false
+    "no-implicit-dependencies": false,
+    "no-this-assignment": false,
+    "object-literal-shorthand": false,
+    "no-object-literal-type-assertion": false
   }
 }
 

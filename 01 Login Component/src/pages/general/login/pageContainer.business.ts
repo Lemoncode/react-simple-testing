@@ -20,24 +20,21 @@ export const onUpdateField = (field: string, value: string, fieldValidationResul
     },
   });
 
-export const onLogin = (formValidationResult: FormValidationResult) =>
-  (state: State): State => {
-    toastr.remove();
+export const onLogin = (loginCredential: LoginCredential) => {
+  toastr.remove();
 
-    const loginCredentialModel = mapLoginCredentialVmToModel(state.loginCredential);
-    login(loginCredentialModel)
-      .then(() => {
-        toastr.success('Login success');
-        history.push(adminRoutes.memberList);
-      })
-      .catch((error) => {
-        toastr.error(error);
-      });
+  const loginCredentialModel = mapLoginCredentialVmToModel(loginCredential);
+  login(loginCredentialModel)
+    .then(() => {
+      toastr.success('Login success');
+      history.push(adminRoutes.memberList);
+    })
+    .catch((error) => {
+      toastr.error(error);
+    });
+};
 
-    return updateFormErrors(state, formValidationResult);
-  };
-
-const updateFormErrors = (state: State, formValidationResult: FormValidationResult): State => ({
+export const updateFormErrors = (formValidationResult: FormValidationResult) => (state: State): State => ({
   ...state,
   loginCredentialError: getFieldValidationResult(state, formValidationResult),
 });

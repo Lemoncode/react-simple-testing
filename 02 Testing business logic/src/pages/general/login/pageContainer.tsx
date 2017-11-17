@@ -26,7 +26,8 @@ export class LoginPageContainer extends React.Component<{}, State> {
     validations
       .validateForm(this.state.loginCredential)
       .then((formValidationResult) => {
-        this.setState(business.onLogin(formValidationResult));
+        business.onLogin(this.state.loginCredential);
+        this.setState(business.updateFormErrors(formValidationResult));
       });
   }
 

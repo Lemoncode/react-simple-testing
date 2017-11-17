@@ -14,6 +14,7 @@ Summary steps:
 - Define `admin` routes.
 - Update `app` routes.
 - Add link to navigate.
+- Implement `Login` page.
 
 # Steps to build it
 
@@ -309,6 +310,383 @@ export const LoginPage: React.StatelessComponent = (props) => (
 +     Navigate to Member List
 +   </Link>
 + </div>
+);
+
+```
+
+- We are going to use `material-ui` for `common` components like `inputs`, `buttons`, `validation` etc:
+
+### ./src/common/components/form/validation.tsx
+
+```javascript
+import * as React from 'react';
+
+interface Props {
+  error?: string;
+}
+
+export const ValidationComponent: React.StatelessComponent<Props> = (props) => {
+  let wrapperClass: string = 'form-group clearfix';
+  if (Boolean(props.error) && props.error.length > 0) {
+    wrapperClass = `${wrapperClass} has-error`;
+  }
+
+  return (
+    <div className={wrapperClass}>
+      {props.children}
+      <div className="help-block">
+        {props.error}
+      </div>
+    </div>
+  );
+};
+
+```
+
+### ./src/common/components/form/input.tsx
+
+```javascript
+import * as React from 'react';
+import { ValidationComponent } from './validation';
+import TextField from 'material-ui/TextField';
+
+interface Props {
+  type: string;
+  name: string;
+  value: string | number;
+  onChange: any;
+  className?: string;
+  label?: string;
+  labelClassName?: string;
+  placeholder?: string;
+  error?: string;
+  disabled?: boolean;
+}
+
+interface State {
+  currentValue: string | number;
+}
+
+export class Input extends React.Component<Props, State> {
+  state = {
+    currentValue: this.props.value,
+  };
+
+  componentWillReceiveProps(nextProps: Props) {
+    if (nextProps.value !== this.state.currentValue) {
+      this.setState({ currentValue: nextProps.value });
+    }
+  }
+
+  onChange = (event) => {
+    const currentValue = event.target.value;
+    this.setState({ currentValue });
+    this.props.onChange(event.target.name, currentValue);
+  }
+
+  render() {
+    return (
+      <div className={this.props.className}>
+        <ValidationComponent error={this.props.error}>
+          <label htmlFor={this.props.name} className={this.props.labelClassName}>
+            {this.props.label}
+          </label>
+          <TextField
+            type={this.props.type}
+            name={this.props.name}
+            hintText={this.props.placeholder}
+            value={this.state.currentValue}
+            onChange={this.onChange}
+            fullWidth={true}
+            disabled={this.props.disabled}
+          />
+        </ValidationComponent>
+      </div>
+    );
+  }
+}
+
+```
+
+### ./src/common/components/form/button.tsx
+
+```javascript
+import * as React from 'react';
+import RaisedButton from 'material-ui/RaisedButton';
+
+interface Props {
+  type: string;
+  onClick: any;
+  wrapperClassName?: string;
+  buttonClassName?: string;
+  label?: string;
+  icon?: React.ReactNode;
+  disabled?: boolean;
+}
+
+export const Button: React.StatelessComponent<Props> = (props) => (
+  <div className={props.wrapperClassName}>
+    <RaisedButton
+      type={props.type}
+      className={props.buttonClassName}
+      label={props.label}
+      icon={props.icon}
+      fullWidth={true}
+      primary={true}
+      onClick={onClick(props)}
+    />
+  </div>
+);
+
+const onClick = (props: Props) => (e) => {
+  e.preventDefault();
+  props.onClick();
+};
+
+```
+
+### ./src/common/components/form/index.ts
+
+```javascript
+export * from './input';
+export * from './button';
+
+```
+
+- Now that it's working the navigation between pages and `common` components, we could focus on implement `Login` page:
+
+### ./src/pages/general/login/viewModel.ts
+
+```javascript
+import { FieldValidationResult } from 'lc-form-validation';
+
+export interface LoginCredential {
+  login: string;
+  password: string;
+}
+
+export const createEmptyLoginCredential = (): LoginCredential => ({
+  login: '',
+  password: '',
+});
+
+export interface LoginCredentialError {
+  login: FieldValidationResult;
+  password: FieldValidationResult;
+}
+
+export const createEmptyLoginCredentialError = (): LoginCredentialError => ({
+  login: new FieldValidationResult(),
+  password: new FieldValidationResult(),
+});
+
+```
+
+### ./src/pages/general/login/components/header.tsx
+
+```javascript
+import * as React from 'react';
+
+export const HeaderComponent: React.StatelessComponent = (props) => (
+  <div className="panel-heading">
+    <h3 className="panel-title">
+      <p>Please sign in</p>
+      <p>(login: admin / pwd: test)</p>
+    </h3>
+  </div>
+);
+
+```
+
+### ./src/pages/general/login/components/form.tsx
+
+```javascript
+import * as React from 'react';
+import { Input, Button } from '../../../../common/components/form';
+import { LoginCredential, LoginCredentialError } from '../viewModel';
+
+interface Props {
+  loginCredential: LoginCredential;
+  loginCredentialError: LoginCredentialError;
+  onUpdateField(field: string, value: string): void;
+  onLogin(): void;
+}
+
+export const FormComponent: React.StatelessComponent<Props> = (props) => (
+  <div className="panel-body">
+    <form role="form">
+      <Input
+        type="text"
+        label="Login"
+        placeholder="Login"
+        name="login"
+        value={props.loginCredential.login}
+        onChange={props.onUpdateField}
+        error={
+          props.loginCredentialError.login.succeeded ?
+            '' :
+            props.loginCredentialError.login.errorMessage
+        }
+      />
+      <Input
+        type="password"
+        label="Password"
+        placeholder="Password"
+        name="password"
+        value={props.loginCredential.password}
+        onChange={props.onUpdateField}
+        error={
+          props.loginCredentialError.password.succeeded ?
+            '' :
+            props.loginCredentialError.password.errorMessage
+        }
+      />
+      <Button
+        type="submit"
+        label="Login"
+        onClick={props.onLogin}
+      />
+    </form>
+  </div>
+);
+
+```
+
+### ./src/pages/general/login/components/index.ts
+
+```javascript
+export * from './header';
+export * from './form';
+
+```
+
+- Update login `page`:
+
+
+### ./src/pages/general/login/page.scss
+
+```scss
+.page {
+  margin-top: 40px;
+}
+
+```
+
+### ./src/pages/general/login/page.tsx
+
+```diff
+import * as React from 'react';
+import { Link } from 'react-router-dom';
+import { adminRoutes } from '../../../common/constants/routes/admin';
++ import { LoginCredential, LoginCredentialError } from './viewModel';
++ import { HeaderComponent, FormComponent } from './components';
++ const styles = require('./page.scss');
+
++ interface Props {
++  loginCredential: LoginCredential;
++  loginCredentialError: LoginCredentialError;
++  onUpdateField(field: string, value: string): void;
++  onLogin(): void;
++ }
+
+- export const LoginPage: React.StatelessComponent = (props) => (
++ export const LoginPage: React.StatelessComponent<Props> = (props) => (
+- <div>
+-   <h1>Login Page</h1>
+-   <Link to={adminRoutes.memberList}>
+-     Navigate to Member List
+-   </Link>
+- </div>
++ <div className={`${styles.page} row`}>
++   <div className="col-md-4 col-md-offset-4">
++     <div className="panel panel-default">
++       <HeaderComponent />
++       <FormComponent
++         loginCredential={props.loginCredential}
++         loginCredentialError={props.loginCredentialError}
++         onUpdateField={props.onUpdateField}
++         onLogin={props.onLogin}
++       />
++     </div>
++   </div>
++ </div>
+);
+
+```
+
+- Update login `pageContainer`:
+
+```diff
+import * as React from 'react';
++ import {
++   LoginCredential, createEmptyLoginCredential,
++   LoginCredentialError, createEmptyLoginCredentialError,
++ } from './viewModel';
++ import { history } from '../../../history';
++ import { adminRoutes } from '../../../common/constants/routes/admin';
+import { LoginPage } from './page';
+
+- export const LoginPageContainer: React.StatelessComponent = (props) => (
+-   <LoginPage
+-   />
+- );
+
++ interface State {
++   loginCredential: LoginCredential;
++   loginCredentialError: LoginCredentialError;
++ }
+
++ export class LoginPageContainer extends React.Component<{}, State> {
++   state = {
++     loginCredential: createEmptyLoginCredential(),
++     loginCredentialError: createEmptyLoginCredentialError(),
++   };
+
++   onUpdateField = (field: string, value: string) => {
++     this.setState({
++       ...this.state,
++       loginCredential: {
++         ...this.state.loginCredential,
++         [field]: value,
++       },
++     });
++   }
+
++   onLogin = () => {
++     if (this.state.loginCredential.login === 'admin' &&
++       this.state.loginCredential.password === 'test') {
++       history.push(adminRoutes.memberList);
++     }
++   }
+
++   render() {
++     return (
++       <LoginPage
++         loginCredential={this.state.loginCredential}
++         loginCredentialError={this.state.loginCredentialError}
++         onUpdateField={this.onUpdateField}
++         onLogin={this.onLogin}
++       />
++     );
++   }
++ }
+
+```
+
+- Finally, to work with `material-ui`:
+
+### ./src/app.tsx
+
+```diff
+import * as React from 'react';
++ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+
+export const App: React.StatelessComponent = (props) => (
++ <MuiThemeProvider>
+    <div className="container-fluid">
+      {props.children}
+    </div>
++ </MuiThemeProvider>
 );
 
 ```

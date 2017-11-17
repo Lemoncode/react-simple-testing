@@ -49,6 +49,7 @@
     "@types/karma-chai-sinon": "^0.1.7",
     "@types/material-ui": "^0.18.4",
     "@types/mocha": "^2.2.44",
+    "@types/node": "^8.0.53",
     "@types/react": "^16.0.24",
     "@types/react-dom": "^16.0.3",
     "@types/react-router-dom": "^4.2.1",

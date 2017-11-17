@@ -1,26 +1,3 @@
-## 02 Testing business logic
-
-In this sample we are going to add unit tests. In this case, we will test all app business logic.
-
-Summary steps:
-
-- Add `mappers` specs.
-- Add `pageContainer.business` specs.
-- Add `validation` specs.
-
-# Steps to build it
-
-## Prerequisites
-
-- In order to follow this step guides you will also need to take sample _01 Login Component_ as starting point.
-
-# Steps
-
-- We could start adding `mappers` specs:
-
-### ./src/pages/general/login/mappers.spec.ts
-
-```javascript
 import { expect } from 'chai';
 import { LoginCredential, createEmptyLoginCredential } from './viewModel';
 import { mapLoginCredentialVmToModel } from './mappers';
@@ -80,31 +57,3 @@ describe('login mappers', () => {
     });
   });
 });
-
-```
-
-- Update `mappers`:
-
-### ./src/pages/general/login/mappers.ts
-
-```diff
-import * as model from '../../../rest-api/model/general';
-import * as vm from './viewModel';
-
-- export const mapLoginCredentialVmToModel = (logingCredential: vm.LoginCredential): model.LoginCredential => ({
--   ...logingCredential,
-- });
-+ export const mapLoginCredentialVmToModel = (loginCredential: vm.LoginCredential): model.LoginCredential => (
-+   Boolean(loginCredential) ?
-+     {
-+       ...loginCredential,
-+     } :
-+     null
-+ );
-
-```
-
-# About Lemoncode
-
-We are a team of long-term experienced freelance developers, established as a group in 2010.
-We specialize in Front End technologies and .NET. [Click here](http://lemoncode.net/services/en/#en-home) to get more info about us. 

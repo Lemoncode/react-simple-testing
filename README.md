@@ -13,7 +13,7 @@ In this sample we are going to create basic project structure with all configura
 
 In this sample we are going to create an app with `Login` component that navigate to other page. We are going to use [`lc-form-validation`](https://github.com/Lemoncode/lcFormValidation) to add login form validations.
 
-## 02 Testing business logic.
+## 02 Testing business logic
 
 In this sample we are going to add unit tests. In this case, we will test all app business logic.
 

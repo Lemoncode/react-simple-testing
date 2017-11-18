@@ -40,7 +40,11 @@ componentsContext.keys().forEach(componentsContext);
 
 ```
 
-- Now, for testing component implemented by `material-ui` we need to add a `helper` for mount that component with the `muiTheme`:
+- Now, for testing component implemented by `material-ui` we need to add a `helper` for mount that component with the `muiTheme`. We need to install the lib `prop-types` too, this time as `dev dependency`:
+
+```bash
+npm install prop-types --save-dev
+```
 
 ### ./src/common/test/muiHelper.ts
 
@@ -72,15 +76,15 @@ export * from './muiHelper';
 ### ./src/common/components/form/input.spec.tsx
 
 ```javascript
-import { shallow, mount } from 'enzyme';
 import * as React from 'react';
+import { shallow } from 'enzyme';
+import { mountMuiWithContext } from '../../test';
 import { ValidationComponent } from './validation';
-import { Input } from './input';
 import TextField from 'material-ui/TextField';
-import { mountMuiWithContext } from '../../test/muiHelper';
+import { Input } from './input';
 
 describe('common/Input component', () => {
-  it('should renders as expected', () => {
+  it('should render as expected', () => {
     // Arrange
     const props = {
       type: 'Test type',
@@ -102,7 +106,7 @@ describe('common/Input component', () => {
     expect(component.find('TextField').prop('value')).to.equal(props.value);
   });
 
-  it('should renders as expected with optional properties', () => {
+  it('should render as expected with optional properties', () => {
     // Arrange
     const props = {
       type: 'Test type',
@@ -138,7 +142,7 @@ describe('common/Input component', () => {
     expect(component.find('TextField').prop('disabled')).to.equal(props.disabled);
   });
 
-  it('Should trigger onChange and propagate property', () => {
+  it('should trigger onChange and propagate property', () => {
     // Arrange
     const props = {
       name: 'Test name',
@@ -159,6 +163,83 @@ describe('common/Input component', () => {
     // Assert
     expect(props.onChange.called).to.be.true;
     expect(props.onChange.calledWith('Test name', 'Test value')).to.be.true;
+  });
+});
+
+```
+
+### ./src/common/components/form/button.spec.tsx
+
+```javascript
+import * as React from 'react';
+import { shallow } from 'enzyme';
+import { mountMuiWithContext } from '../../test';
+import RaisedButton from 'material-ui/RaisedButton';
+import { Button } from './button';
+
+describe('common/Button component', () => {
+  it('should render as expected', () => {
+    // Arrange
+    const props = {
+      type: 'test type',
+      onClick: () => { },
+    };
+
+    // Act
+    const component = shallow(
+      <Button {...props} />,
+    );
+
+    // Assert
+    expect(component.find('RaisedButton').prop('type')).to.be.equal(props.type);
+    expect(component.find('RaisedButton').prop('fullWidth')).to.be.true;
+    expect(component.find('RaisedButton').prop('primary')).to.be.true;
+  });
+
+  it('should render as expected with optional properties', () => {
+    // Arrange
+    const props = {
+      type: 'test type',
+      onClick: () => { },
+      wrapperClassName: 'test wrapperClassName',
+      buttonClassName: 'test buttonClassName',
+      label: 'test label',
+      icon: <div><img src="test" /></div>,
+      disabled: true,
+    };
+
+    // Act
+    const component = shallow(
+      <Button {...props} />,
+    );
+
+    // Assert
+    expect(component.find('div').prop('className')).to.be.equal(props.wrapperClassName);
+
+    expect(component.find('RaisedButton').prop('type')).to.be.equal(props.type);
+    expect(component.find('RaisedButton').prop('className')).to.be.equal(props.buttonClassName);
+    expect(component.find('RaisedButton').prop('label')).to.be.equal(props.label);
+    expect(component.find('RaisedButton').prop('icon')).to.be.equal(props.icon);
+    expect(component.find('RaisedButton').prop('fullWidth')).to.be.true;
+    expect(component.find('RaisedButton').prop('primary')).to.be.true;
+  });
+
+  it('should trigger onClick and propagate property', () => {
+    // Arrange
+    const props = {
+      type: 'test type',
+      onClick: sinon.spy(),
+    };
+
+    // Act
+    const component = mountMuiWithContext(
+      <Button {...props} />,
+    );
+
+    const button = component.find(RaisedButton).find('button').simulate('click');
+
+    // Assert
+    expect(props.onClick.calledOnce).to.be.true;
   });
 });
 

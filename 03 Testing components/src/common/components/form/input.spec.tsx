@@ -1,12 +1,12 @@
-import { shallow, mount } from 'enzyme';
 import * as React from 'react';
+import { shallow } from 'enzyme';
+import { mountMuiWithContext } from '../../test';
 import { ValidationComponent } from './validation';
-import { Input } from './input';
 import TextField from 'material-ui/TextField';
-import { mountMuiWithContext } from '../../test/muiHelper';
+import { Input } from './input';
 
 describe('common/Input component', () => {
-  it('should renders as expected', () => {
+  it('should render as expected', () => {
     // Arrange
     const props = {
       type: 'Test type',
@@ -28,7 +28,7 @@ describe('common/Input component', () => {
     expect(component.find('TextField').prop('value')).to.equal(props.value);
   });
 
-  it('should renders as expected with optional properties', () => {
+  it('should render as expected with optional properties', () => {
     // Arrange
     const props = {
       type: 'Test type',
@@ -64,7 +64,7 @@ describe('common/Input component', () => {
     expect(component.find('TextField').prop('disabled')).to.equal(props.disabled);
   });
 
-  it('Should trigger onChange and propagate property', () => {
+  it('should trigger onChange and propagate property', () => {
     // Arrange
     const props = {
       name: 'Test name',

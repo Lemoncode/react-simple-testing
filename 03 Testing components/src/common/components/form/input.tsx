@@ -7,7 +7,7 @@ interface Props {
   name: string;
   value: string | number;
   onChange: any;
-  className?: string;
+  wrapperClassName?: string;
   label?: string;
   labelClassName?: string;
   placeholder?: string;
@@ -38,7 +38,7 @@ export class Input extends React.Component<Props, State> {
 
   render() {
     return (
-      <div className={this.props.className}>
+      <div className={this.props.wrapperClassName}>
         <ValidationComponent error={this.props.error}>
           <label htmlFor={this.props.name} className={this.props.labelClassName}>
             {this.props.label}

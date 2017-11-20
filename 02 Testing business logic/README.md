@@ -267,6 +267,7 @@ import {
   LoginCredential, createEmptyLoginCredential,
   LoginCredentialError, createEmptyLoginCredentialError,
 } from './viewModel';
++ import * as toastr from 'toastr';
 + import * as mappers from './mappers';
 + import * as api from '../../../rest-api/api/general';
 + import { history } from '../../../history';
